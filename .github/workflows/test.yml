@@ -1,0 +1,114 @@
+name: test
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+    name: build - Python ${{ matrix.python-version }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+
+      - name: Build
+        run: scripts/build.sh
+        shell: bash
+
+      - name: Lint
+        run: scripts/lint.sh
+        shell: bash
+
+      - name: Test (release)
+        timeout-minutes: 5
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: scripts/test.sh -vvv --release
+        shell: bash
+
+      - name: Test
+        timeout-minutes: 5
+        if: ${{ github.ref != 'refs/heads/main' }}
+        run: scripts/test.sh -vvv
+        shell: bash
+
+      - name: Upload coverage to Codecov
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+
+      - name: Build
+        run: scripts/build.sh
+        shell: bash
+
+      - name: Run integration tests
+        env:
+          QUANTDLE_API_KEY: ${{ secrets.QUANTDLE_API_KEY }}
+        run: |
+          python3 -m poetry run pytest tests/ -v -m integration --cov=quantdle
+        continue-on-error: true
+
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+
+      - name: Build
+        run: scripts/build.sh
+        shell: bash
+
+      - name: Run security checks
+        run: |
+          python3 -m poetry run safety check
+          python3 -m poetry run bandit -r quantdle -f json -o bandit-report.json
+        continue-on-error: true
+
+      - name: Upload bandit report
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: bandit-report
+          path: bandit-report.json 

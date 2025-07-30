@@ -1,0 +1,30 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 85%
+        threshold: 2%
+        base: auto
+    patch:
+      default:
+        target: 80%
+        threshold: 5%
+        base: auto
+  
+  ignore:
+    - "tests/"
+    - "docs/"
+    - "examples/"
+    - "setup.py"
+    - "*/tests/*"
+    - "*/__pycache__/*"
+
+comment:
+  layout: "diff, flags, files"
+  behavior: default
+  require_changes: false
+  require_base: false
+  require_head: true
+
+github_checks:
+  annotations: true 
