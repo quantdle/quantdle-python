@@ -68,7 +68,7 @@ client = qdl.Client(
 )
 
 # Download different symbols and timeframes
-btc_data = client.download_data("BTCUSD", "D1", "2023-01-01", "2023-12-31")
+xau_data = client.download_data("XAUUSD", "D1", "2023-01-01", "2023-12-31")
 eur_data = client.download_data("EURUSD", "H1", "2023-01-01", "2023-01-31")
 ```
 
