@@ -31,11 +31,11 @@ jobs:
 
       - name: Build
         run: |
-          python3 -m poetry build --no-interaction
-          echo "RELEASE_NAME=$(python3 -m poetry version)" >> $GITHUB_ENV
-          echo "TAG_NAME=v$(python3 -m poetry version -s)" >> $GITHUB_ENV
+          poetry build --no-interaction
+          echo "RELEASE_NAME=$(poetry version)" >> $GITHUB_ENV
+          echo "TAG_NAME=v$(poetry version -s)" >> $GITHUB_ENV
           echo "## Release notes" > NOTES.md
-          echo "Automated release for $(python3 -m poetry version)" >> NOTES.md
+          echo "Automated release for $(poetry version)" >> NOTES.md
           echo "" >> NOTES.md
           echo "This release was automatically created from the main branch." >> NOTES.md
 
@@ -52,4 +52,4 @@ jobs:
       - name: Publish
         env:
           POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
-        run: python3 -m poetry publish 
+        run: poetry publish 

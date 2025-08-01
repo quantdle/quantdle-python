@@ -99,7 +99,7 @@ jobs:
         env:
           QUANTDLE_API_KEY: ${{ secrets.QUANTDLE_API_KEY }}
         run: |
-          python3 -m poetry run pytest tests/ -v -m integration --cov=quantdle
+          poetry run pytest tests/ -v -m integration --cov=quantdle
         continue-on-error: true
 
   security-scan:
@@ -128,8 +128,8 @@ jobs:
 
       - name: Run security checks
         run: |
-          python3 -m poetry run safety check
-          python3 -m poetry run bandit -r quantdle -f json -o bandit-report.json
+          poetry run safety check
+          poetry run bandit -r quantdle -f json -o bandit-report.json
         continue-on-error: true
 
       - name: Upload bandit report
