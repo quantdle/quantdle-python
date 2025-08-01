@@ -53,6 +53,7 @@ coverage = {extras = ["toml"], version = ">=7.0"}
 black = ">=23.0"
 flake8 = ">=6.0"
 mypy = ">=1.0"
+types-requests = ">=2.25.0"  # Type stubs for requests
 pre-commit = ">=3.0"
 responses = ">=0.23.0"  # Mock HTTP requests
 freezegun = ">=1.2.0"   # Mock datetime
@@ -76,4 +77,13 @@ target-version = ['py39']
 python_version = "3.9"
 disallow_untyped_defs = true
 ignore_missing_imports = true
-warn_unused_configs = true 
+warn_unused_configs = true
+no_implicit_optional = false
+
+# Exclude examples and test files from strict type checking
+[[tool.mypy.overrides]]
+module = [
+    "examples.*",
+    "tests.*"
+]
+disallow_untyped_defs = false 

@@ -6,13 +6,16 @@ Automatically handles data downloading, extraction, and conversion to pandas/pol
 """
 
 from datetime import datetime
-from typing import Union, Literal
+from typing import Union, Literal, TYPE_CHECKING
 
 import pandas as pd
 import requests
 
 from .symbols import SymbolsAPI
 from .data_downloader import DataDownloader
+
+if TYPE_CHECKING:
+    import polars as pl
 
 
 class Client:
@@ -92,7 +95,7 @@ class Client:
         output_format: Literal['pandas', 'polars'] = 'pandas',
         max_workers: int = 4,
         show_progress: bool = True
-    ) -> Union[pd.DataFrame, 'pl.DataFrame']:
+    ) -> Union[pd.DataFrame, "pl.DataFrame"]:
         """
         Download historical market data for a symbol and timeframe.
         
