@@ -6,7 +6,7 @@ Automatically handles data downloading, extraction, and conversion to pandas/pol
 """
 
 from datetime import datetime
-from typing import Union, Literal, TYPE_CHECKING
+from typing import Union, Literal, TYPE_CHECKING, Optional, Any, Type
 
 import pandas as pd
 import requests
@@ -135,16 +135,16 @@ class Client:
             show_progress=show_progress
         )
     
-    def __enter__(self):
+    def __enter__(self) -> "Client":
         """Context manager entry."""
         return self
     
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type: Optional[Type[BaseException]], exc_val: Optional[BaseException], exc_tb: Optional[Any]) -> None:
         """Context manager exit."""
         if hasattr(self, '_Client__session'):
             self.__session.close()
     
-    def __del__(self):
+    def __del__(self) -> None:
         """Clean up the session when the client is destroyed."""
         if hasattr(self, '_Client__session'):
             self.__session.close()

@@ -128,7 +128,7 @@ jobs:
 
       - name: Run security checks
         run: |
-          poetry run safety check
+          poetry run safety scan
           poetry run bandit -r quantdle -f json -o bandit-report.json
         continue-on-error: true
 

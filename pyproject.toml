@@ -79,11 +79,7 @@ disallow_untyped_defs = true
 ignore_missing_imports = true
 warn_unused_configs = true
 no_implicit_optional = false
-
-# Exclude examples and test files from strict type checking
-[[tool.mypy.overrides]]
-module = [
-    "examples.*",
-    "tests.*"
-]
-disallow_untyped_defs = false 
+exclude = [
+    "examples/.*",
+    "tests/.*"
+] 
