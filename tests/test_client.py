@@ -20,7 +20,7 @@ class TestClient:
         client = Client(api_key="test_key", api_key_id="test_key_id")
         assert client.api_key == "test_key"
         assert client.api_key_id == "test_key_id"
-        assert client._Client__host == "https://api.quantdle.com/hist/v1"
+        assert client._Client__host == "https://hist.quantdle.com/v1"
         assert isinstance(client._Client__session, requests.Session)
         assert client._Client__session.headers['x-api-key'] == 'test_key'
     
