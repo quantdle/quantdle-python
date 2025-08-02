@@ -160,9 +160,12 @@ class TestDataDownloader:
             # Verify all URLs were processed
             assert mock_extract.call_count == 2
             
-            # Verify combined data
+            # Verify combined data (order may vary due to parallel processing)
             expected_result = mock_data[0] + mock_data[1]
-            assert result == expected_result
+            # Sort both results by timestamp for consistent comparison
+            result_sorted = sorted(result, key=lambda x: x['timestamp'])
+            expected_sorted = sorted(expected_result, key=lambda x: x['timestamp'])
+            assert result_sorted == expected_sorted
     
     def test_download_chunk_no_urls(self):
         """Test chunk download with no URLs"""
