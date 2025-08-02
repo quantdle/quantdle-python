@@ -6,13 +6,16 @@ Automatically handles data downloading, extraction, and conversion to pandas/pol
 """
 
 from datetime import datetime
-from typing import Union, Literal
+from typing import Union, Literal, TYPE_CHECKING, Optional, Any, Type
 
 import pandas as pd
 import requests
 
 from .symbols import SymbolsAPI
 from .data_downloader import DataDownloader
+
+if TYPE_CHECKING:
+    import polars as pl
 
 
 class Client:
@@ -36,14 +39,14 @@ class Client:
         >>> df = client.download_data("EURUSD", "H1", "2023-01-01", "2023-12-31")
     """
     
-    def __init__(self, api_key: str, api_key_id: str, host: str = "https://api.quantdle.com/hist/v1"):
+    def __init__(self, api_key: str, api_key_id: str, host: str = "https://hist.quantdle.com"):
         """
         Initialize the Quantdle client.
         
         Args:
             api_key: Your Quantdle API key
             api_key_id: Your Quantdle API key ID
-            host: API host URL (default: https://api.quantdle.com/hist/v1)
+            host: API host URL (default: https://hist.quantdle.com)
         """
         self.api_key = api_key
         self.api_key_id = api_key_id
@@ -92,7 +95,7 @@ class Client:
         output_format: Literal['pandas', 'polars'] = 'pandas',
         max_workers: int = 4,
         show_progress: bool = True
-    ) -> Union[pd.DataFrame, 'pl.DataFrame']:
+    ) -> Union[pd.DataFrame, "pl.DataFrame"]:
         """
         Download historical market data for a symbol and timeframe.
         
@@ -132,16 +135,16 @@ class Client:
             show_progress=show_progress
         )
     
-    def __enter__(self):
+    def __enter__(self) -> "Client":
         """Context manager entry."""
         return self
     
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type: Optional[Type[BaseException]], exc_val: Optional[BaseException], exc_tb: Optional[Any]) -> None:
         """Context manager exit."""
         if hasattr(self, '_Client__session'):
             self.__session.close()
     
-    def __del__(self):
+    def __del__(self) -> None:
         """Clean up the session when the client is destroyed."""
         if hasattr(self, '_Client__session'):
             self.__session.close()

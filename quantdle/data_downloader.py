@@ -13,12 +13,15 @@ import json
 import zipfile
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
-from typing import Union, Literal
+from typing import Union, Literal, TYPE_CHECKING, Optional
 import warnings
 
 import pandas as pd
 import requests
 from tqdm import tqdm
+
+if TYPE_CHECKING:
+    import polars as pl
 
 
 class DataDownloader:
@@ -37,7 +40,7 @@ class DataDownloader:
         self.__session = session
         self.__host = host
     
-    def __make_request(self, method: str, endpoint: str, params: dict = None) -> dict:
+    def __make_request(self, method: str, endpoint: str, params: Optional[dict] = None) -> dict:
         """
         Make a request to the Quantdle API.
         
@@ -77,7 +80,7 @@ class DataDownloader:
         max_workers: int = 4,
         show_progress: bool = True,
         chunk_size_years: int = 5
-    ) -> Union[pd.DataFrame, 'pl.DataFrame']:
+    ) -> Union[pd.DataFrame, "pl.DataFrame"]:
         """
         Download historical market data for a symbol and timeframe.
         

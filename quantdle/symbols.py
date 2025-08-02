@@ -5,6 +5,7 @@ Handles symbol-related API operations like listing available symbols
 and getting symbol information.
 """
 
+from typing import Optional
 import requests
 
 
@@ -24,7 +25,7 @@ class SymbolsAPI:
         self.__session = session
         self.__host = host
     
-    def __make_request(self, method: str, endpoint: str, params: dict = None) -> dict:
+    def __make_request(self, method: str, endpoint: str, params: Optional[dict] = None) -> dict:
         """
         Make a request to the Quantdle API.
         
