@@ -39,14 +39,14 @@ class Client:
         >>> df = client.download_data("EURUSD", "H1", "2023-01-01", "2023-12-31")
     """
     
-    def __init__(self, api_key: str, api_key_id: str, host: str = "https://hist.quantdle.com/v1"):
+    def __init__(self, api_key: str, api_key_id: str, host: str = "https://hist.quantdle.com"):
         """
         Initialize the Quantdle client.
         
         Args:
             api_key: Your Quantdle API key
             api_key_id: Your Quantdle API key ID
-            host: API host URL (default: https://hist.quantdle.com/v1)
+            host: API host URL (default: https://hist.quantdle.com)
         """
         self.api_key = api_key
         self.api_key_id = api_key_id
