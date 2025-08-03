@@ -177,6 +177,9 @@ The returned DataFrame contains the following columns:
 | low | float | Lowest price |
 | close | float | Closing price |
 | volume | int | Trading volume |
+| spread | int | Average spread of the bar |
+| spreadmax | int | Maximum spread of the bar |
+| spread_open | int | Opening spread of the bar |
 
 ## Error Handling
 
