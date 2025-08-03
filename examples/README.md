@@ -94,10 +94,9 @@ jupyter notebook quantdle_examples.ipynb
 
 The examples will download various financial instruments including:
 
-- **EURUSD** - Major forex pair
-- **GBPUSD** - Major forex pair  
-- **XAUUSD** - Gold spot price
-- **BTCUSD** - Bitcoin cryptocurrency
+- **EURUSD** - Euro vs. US Dollar
+- **GBPUSD** - British Pound vs. US Dollar  
+- **XAUUSD** - Gold vs. US Dollar
 
 ## 🛠️ Customization
 
@@ -145,7 +144,3 @@ Found an issue or want to improve the examples? Contributions are welcome!
 2. Create a feature branch
 3. Make your improvements
 4. Submit a pull request
-
----
-
-**Happy trading!** 📈 
