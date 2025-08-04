@@ -7,7 +7,7 @@
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-A user-friendly Python client for downloading financial market data from [Quantdle](https://quantdle.com). This client simplifies the process of accessing historical market data by handling all the complexity of data downloading, extraction, and processing.
+A user-friendly Python client for downloading financial market data from [Quantdle](https://quantdle.com). This client simplifies the process of accessing historical market data by handling all the complexity of data downloading, extraction and processing.
 
 ## Features
 
@@ -177,6 +177,9 @@ The returned DataFrame contains the following columns:
 | low | float | Lowest price |
 | close | float | Closing price |
 | volume | int | Trading volume |
+| spread | int | Average spread of the bar |
+| spreadmax | int | Maximum spread of the bar |
+| spread_open | int | Opening spread of the bar |
 
 ## Error Handling
 
