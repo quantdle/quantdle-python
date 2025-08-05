@@ -50,7 +50,7 @@ def setup_client():
         print("   export QDL_API_KEY_ID='your-api-key-id'")
         return None
     
-    # Option 2: Direct assignment (not recommended for production)
+    # Option 2: Direct assignment (not recommended for production due to security risks)
     # api_key = "your-api-key"
     # api_key_id = "your-api-key-id"
     
