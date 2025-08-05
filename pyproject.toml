@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "quantdle"
-version = "1.0.0"
-description = "Official Python client for downloading clean market data from Quantdle"
+version = "1.0.1"
+description = "Official Python client library for Quantdle"
 authors = [
     "Quantdle <support@quantdle.com>",
 ]
