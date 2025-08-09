@@ -64,9 +64,45 @@ class DataDownloader:
                 params=params,
                 timeout=30
             )
+
+            # Handle common API errors gracefully for a better user experience
+            if response.status_code == 403:
+                # Extract symbol if this is a data endpoint like '/data/SYMBOL'
+                symbol = None
+                try:
+                    if endpoint.startswith('/data/'):
+                        symbol = endpoint.split('/')[-1]
+                except Exception:
+                    symbol = None
+
+                nice_symbol = f" '{symbol}'" if symbol else ""
+                warnings.warn(
+                    (
+                        f"Cannot download data for symbol{nice_symbol} because it is not included in your current plan. "
+                        "This symbol is available on a higher tier. "
+                        "Use client.get_available_symbols() to list the symbols you can access, or upgrade your plan to include this symbol."
+                    )
+                )
+                # Return an empty set of URLs so the caller can complete gracefully
+                return {"presigned_urls": []}
+
+            if response.status_code == 404:
+                # Not found (e.g., unknown symbol)
+                warnings.warn(
+                    "Requested resource was not found. Please double-check the symbol and timeframe, "
+                    "or call client.get_available_symbols() to see what you can access."
+                )
+                return {"presigned_urls": []}
+
+            if response.status_code == 401:
+                raise Exception(
+                    "Authentication failed (401). Please verify your API key and API key ID."
+                )
+
+            # Raise for other non-success codes
             response.raise_for_status()
             return response.json()
-            
+
         except requests.exceptions.RequestException as e:
             raise Exception(f"API request failed: {str(e)}")
     
@@ -253,7 +289,7 @@ class DataDownloader:
                     as_completed(future_to_url),
                     total=len(urls),
                     desc="Downloading Quantdle Data",
-                    unit="Quantdles"
+                    unit=" Quantdles"
                 )
             else:
                 futures = as_completed(future_to_url)
