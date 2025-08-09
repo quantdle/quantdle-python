@@ -47,6 +47,39 @@ class TestDataDownloader:
         )
         
         assert result == {"presigned_urls": ["url1", "url2"]}
+
+    def test_make_request_403_forbidden_returns_empty_and_warns(self):
+        """403 Forbidden should not raise, but warn and return empty URLs."""
+        # Mock 403 response
+        mock_response = Mock()
+        mock_response.status_code = 403
+        # raise_for_status would raise, but our code short-circuits before calling it
+        self.mock_session.request.return_value = mock_response
+
+        with patch('quantdle.data_downloader.warnings.warn') as mock_warn:
+            result = self.downloader._DataDownloader__make_request(
+                "GET", "/data/AUDCAD", {"timeframe": "D1"}
+            )
+
+        mock_warn.assert_called_once()
+        # Ensure message mentions plan limitation
+        warn_msg = mock_warn.call_args[0][0]
+        assert "not included in your current plan" in warn_msg
+        assert result == {"presigned_urls": []}
+
+    def test_make_request_404_not_found_returns_empty_and_warns(self):
+        """404 Not Found should not raise, but warn and return empty URLs."""
+        mock_response = Mock()
+        mock_response.status_code = 404
+        self.mock_session.request.return_value = mock_response
+
+        with patch('quantdle.data_downloader.warnings.warn') as mock_warn:
+            result = self.downloader._DataDownloader__make_request(
+                "GET", "/data/UNKNOWN", {"timeframe": "H1"}
+            )
+
+        mock_warn.assert_called_once()
+        assert result == {"presigned_urls": []}
     
     @patch('quantdle.data_downloader.requests.get')
     def test_download_and_extract_zip_success(self, mock_get):
