@@ -282,23 +282,25 @@ class TestDataDownloader:
             )
             assert isinstance(df_pandas, pd.DataFrame)
             
-            # Test polars format request without polars installed
-            # We'll mock the import to simulate polars not being available
-            original_import = __builtins__['__import__']
-            def mock_import(name, *args, **kwargs):
-                if name == 'polars':
-                    raise ImportError("No module named 'polars'")
-                return original_import(name, *args, **kwargs)
-            
-            __builtins__['__import__'] = mock_import
+            # Test polars format - try to actually convert if polars is available
             try:
+                import polars as pl
+                # Polars is installed, test successful conversion
+                df_polars = self.downloader._download_data(
+                    "EURUSD", "H1", "2023-01-01", "2023-01-02",
+                    output_format="polars", show_progress=False
+                )
+                assert isinstance(df_polars, pl.DataFrame)
+                # Verify datetime column exists and is not lost
+                assert "datetime" in df_polars.columns
+                assert len(df_polars) == 1
+            except ImportError:
+                # Polars not installed, test the error handling
                 with pytest.raises(ImportError, match="Polars is not installed"):
                     self.downloader._download_data(
                         "EURUSD", "H1", "2023-01-01", "2023-01-02",
                         output_format="polars", show_progress=False
                     )
-            finally:
-                __builtins__['__import__'] = original_import
     
     def test_download_data_no_data(self):
         """Test download_data with no data returned"""
@@ -313,6 +315,28 @@ class TestDataDownloader:
                 mock_warn.assert_called_once()
                 assert isinstance(df, pd.DataFrame)
                 assert len(df) == 0
+    
+    def test_download_data_no_data_polars(self):
+        """Test download_data with no data returned and polars output format"""
+        with patch.object(self.downloader, '_DataDownloader__download_chunk') as mock_chunk:
+            mock_chunk.return_value = []
+            
+            try:
+                import polars as pl
+                # Polars is installed, test it returns empty polars DataFrame
+                with patch('quantdle.data_downloader.warnings.warn') as mock_warn:
+                    df = self.downloader._download_data(
+                        "EURUSD", "H1", "2023-01-01", "2023-01-02", 
+                        output_format="polars", show_progress=False
+                    )
+                    
+                    mock_warn.assert_called_once()
+                    assert isinstance(df, pl.DataFrame)
+                    assert len(df) == 0
+                    assert "datetime" in df.columns
+            except ImportError:
+                # Polars not installed, skip this test
+                pytest.skip("Polars not installed")
     
     def test_download_data_duplicate_removal(self):
         """Test that duplicate timestamps are removed"""

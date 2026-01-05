@@ -233,7 +233,9 @@ class DataDownloader:
         
         if output_format == 'polars':
             import polars as pl
-            return pl.from_pandas(df)
+            # Reset index to preserve datetime as a column (Polars doesn't support row indices)
+            df_reset = df.reset_index()
+            return pl.from_pandas(df_reset)
         
         return df
     
