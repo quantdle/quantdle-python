@@ -231,6 +231,9 @@ class DataDownloader:
         # Sort the dataframe by index
         df = df.sort_index()
         
+        # Filter to exact date range requested by user
+        df = df.loc[start_date:end_date]
+        
         if output_format == 'polars':
             import polars as pl
             # Reset index to preserve datetime as a column (Polars doesn't support row indices)
