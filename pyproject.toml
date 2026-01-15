@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "quantdle"
-version = "1.0.3"
+version = "1.0.4"
 description = "Official Python client library for Quantdle"
 authors = ["Quantdle <support@quantdle.com>"]
 license = "Apache License 2.0"
