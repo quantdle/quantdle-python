@@ -231,6 +231,10 @@ class DataDownloader:
         # Sort the dataframe by index
         df = df.sort_index()
         
+        # Filter to exact date range requested by user
+        # Using slice notation with .loc[] always returns a DataFrame (not a Series)
+        df = df.loc[pd.Timestamp(start_date):pd.Timestamp(end_date)]  # type: ignore[assignment]
+        
         if output_format == 'polars':
             import polars as pl
             # Reset index to preserve datetime as a column (Polars doesn't support row indices)

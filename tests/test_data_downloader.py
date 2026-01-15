@@ -359,6 +359,70 @@ class TestDataDownloader:
             # The exact length depends on how duplicates are handled, 
             # but it should be less than the original mock data
             assert len(df) <= len(mock_data)
+    
+    def test_download_data_filters_to_exact_date_range(self):
+        """Test that data is filtered to exact start_date and end_date"""
+        # Mock data that extends beyond the requested date range
+        # This simulates API returning full month when user only requests partial month
+        mock_data = [
+            {"date": "2025-01-01", "time": "00:00:00", "open": 1.0, "high": 1.1, "low": 0.9, "close": 1.05, "volume": 100},
+            {"date": "2025-01-12", "time": "00:00:00", "open": 1.1, "high": 1.2, "low": 1.0, "close": 1.15, "volume": 200},
+            {"date": "2025-01-12", "time": "23:00:00", "open": 1.15, "high": 1.25, "low": 1.1, "close": 1.2, "volume": 300},
+            {"date": "2025-01-20", "time": "00:00:00", "open": 1.2, "high": 1.3, "low": 1.15, "close": 1.25, "volume": 250},
+            {"date": "2025-01-31", "time": "23:00:00", "open": 1.25, "high": 1.35, "low": 1.2, "close": 1.3, "volume": 350},  # Beyond requested range
+        ]
+        
+        with patch.object(self.downloader, '_DataDownloader__download_chunk') as mock_chunk:
+            mock_chunk.return_value = mock_data
+            
+            # Request data from 2018-08-01 to 2025-01-12
+            df = self.downloader._download_data(
+                "XAUUSD", "H1", "2018-08-01", "2025-01-12", show_progress=False
+            )
+            
+            # Verify dataframe is filtered correctly
+            assert isinstance(df, pd.DataFrame)
+            assert len(df) > 0
+            
+            # Check that no data is after the requested end_date
+            max_date = pd.Timestamp(df.index.max())  # type: ignore
+            assert max_date <= pd.Timestamp("2025-01-12 23:59:59")
+            
+            # Check that no data is before the requested start_date
+            min_date = pd.Timestamp(df.index.min())  # type: ignore
+            assert min_date >= pd.Timestamp("2018-08-01 00:00:00")
+    
+    def test_download_data_filters_with_datetime_objects(self):
+        """Test that date filtering works with datetime objects as input"""
+        # Mock data that extends beyond the requested date range
+        mock_data = [
+            {"date": "2023-06-01", "time": "00:00:00", "open": 1.0, "high": 1.1, "low": 0.9, "close": 1.05, "volume": 100},
+            {"date": "2023-06-15", "time": "12:00:00", "open": 1.1, "high": 1.2, "low": 1.0, "close": 1.15, "volume": 200},
+            {"date": "2023-06-30", "time": "23:00:00", "open": 1.2, "high": 1.3, "low": 1.15, "close": 1.25, "volume": 250},  # Beyond requested range
+        ]
+        
+        with patch.object(self.downloader, '_DataDownloader__download_chunk') as mock_chunk:
+            mock_chunk.return_value = mock_data
+            
+            # Request data using datetime objects
+            df = self.downloader._download_data(
+                "EURUSD", "H1", 
+                datetime(2023, 6, 1), 
+                datetime(2023, 6, 15), 
+                show_progress=False
+            )
+            
+            # Verify dataframe is filtered correctly
+            assert isinstance(df, pd.DataFrame)
+            assert len(df) > 0
+            
+            # Check that no data is after the requested end_date
+            max_date = pd.Timestamp(df.index.max())  # type: ignore
+            assert max_date <= pd.Timestamp("2023-06-15 23:59:59")
+            
+            # Verify we have the expected data (first two rows, not the third)
+            # Should be 2 rows max since the third is beyond end_date
+            assert len(df) <= 2
 
 
 class TestDataDownloaderIntegration:
